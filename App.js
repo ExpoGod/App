@@ -16,6 +16,7 @@ import Translator from "./Screens/Translator";
 import Interpreter from "./Screens/Interpreter";
 import Questions from "./Screens/Questions";
 import menuStyles from "./Styles/Screens/Menu";
+import Header from "./Components/Header";
 
 const Stack = createNativeStackNavigator();
 
@@ -24,13 +25,7 @@ SplashScreen.preventAutoHideAsync();
 function Home({ navigation }) {
   return (
     <SafeAreaView style={menuStyles.container}>
-      <View style={menuStyles.titleContainer}>
-        <Text style={menuStyles.title}>Bienvenido/a 👋</Text>
-        <Text style={menuStyles.paragraph}>
-          Explora nuestras funciones para mejorar la comunicación en lengua de
-          señas
-        </Text>
-      </View>
+      <Header />
       <View>
         <Button
           title="Traductor de LSM"
