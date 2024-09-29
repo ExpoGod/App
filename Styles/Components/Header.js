@@ -6,11 +6,10 @@ const headerStyles = StyleSheet.create({
     height: "auto",
     alignItems: "center",
     marginTop: 20,
-    marginBottom: 25,
   },
   title: {
     fontFamily: "Poppins_700Bold",
-    fontSize: 35,
+    fontSize: 25,
     color: "#1210af",
   },
   paragraph: {
