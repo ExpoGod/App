@@ -1,12 +1,17 @@
 import * as React from "react";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { Text, Button } from "react-native";
+import { View, Text, Button } from "react-native";
 import { useFonts } from "expo-font";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Poppins_700Bold } from "@expo-google-fonts/poppins";
+import {
+  Poppins_400Regular,
+  Poppins_500Medium,
+  Poppins_600SemiBold,
+  Poppins_700Bold,
+} from "@expo-google-fonts/poppins";
 import Translator from "./Screens/Translator";
 import Interpreter from "./Screens/Interpreter";
 import Questions from "./Screens/Questions";
@@ -19,25 +24,38 @@ SplashScreen.preventAutoHideAsync();
 function Home({ navigation }) {
   return (
     <SafeAreaView style={menuStyles.container}>
-      <Text style={menuStyles.title}>Menú</Text>
-      <Button
-        title="Traductor de LSM"
-        onPress={() => navigation.navigate("Translator")}
-      />
-      <Button
-        title="Intérprete Virtual"
-        onPress={() => navigation.navigate("Interpreter")}
-      />
-      <Button
-        title="Preguntas Frecuentes"
-        onPress={() => navigation.navigate("Questions")}
-      />
+      <View style={menuStyles.titleContainer}>
+        <Text style={menuStyles.title}>Bienvenido/a 👋</Text>
+        <Text style={menuStyles.paragraph}>
+          Explora nuestras funciones para mejorar la comunicación en lengua de
+          señas
+        </Text>
+      </View>
+      <View>
+        <Button
+          title="Traductor de LSM"
+          onPress={() => navigation.navigate("Translator")}
+        />
+      </View>
+      <View>
+        <Button
+          title="Intérprete Virtual"
+          onPress={() => navigation.navigate("Interpreter")}
+        />
+        <Button
+          title="Preguntas Frecuentes"
+          onPress={() => navigation.navigate("Questions")}
+        />
+      </View>
     </SafeAreaView>
   );
 }
 
 function App() {
   const [loaded, error] = useFonts({
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
     Poppins_700Bold,
   });
 
@@ -62,12 +80,26 @@ function App() {
         <Stack.Screen
           name="Translator"
           component={Translator}
-          options={{ title: "Intérprete Virtual", headerTitleAlign: "center" }}
+          options={{
+            title: "Intérprete Virtual",
+            headerTitleAlign: "center",
+            headerTitleStyle: {
+              fontFamily: "Poppins_600SemiBold",
+              color: "#1210af",
+            },
+          }}
         />
         <Stack.Screen
           name="Interpreter"
           component={Interpreter}
-          options={{ title: "Traductor de LSM", headerTitleAlign: "center" }}
+          options={{
+            title: "Traductor de LSM",
+            headerTitleAlign: "center",
+            headerTitleStyle: {
+              fontFamily: "Poppins_600SemiBold",
+              color: "#1210af",
+            },
+          }}
         />
         <Stack.Screen
           name="Questions"
@@ -75,6 +107,10 @@ function App() {
           options={{
             title: "Preguntas Frecuentes",
             headerTitleAlign: "center",
+            headerTitleStyle: {
+              fontFamily: "Poppins_600SemiBold",
+              color: "#1210af",
+            },
           }}
         />
       </Stack.Navigator>

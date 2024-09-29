@@ -7,21 +7,42 @@ const Tab = createMaterialTopTabNavigator();
 
 const Sections = () => {
   return (
-    <Tab.Navigator initialRouteName="Legal">
+    <Tab.Navigator
+      initialRouteName="Legal"
+      screenOptions={({ route }) => ({
+        tabBarLabel:
+          route.name === "Legal"
+            ? "Juridico"
+            : route.name === "Medical"
+            ? "Medico"
+            : "Deportivo",
+        tabBarActiveTintColor: "#1210af",
+        tabBarInactiveTintColor: "#908e9b",
+      })}
+    >
       <Tab.Screen
         name="Legal"
         component={Legal}
-        options={{ tabBarLabel: "Juridico" }}
+        options={{
+          tabBarLabel: "Juridico",
+          tabBarLabelStyle: { fontFamily: "Poppins_500Medium" },
+        }}
       />
       <Tab.Screen
-        name="Educational"
+        name="Meical"
         component={Medical}
-        options={{ tabBarLabel: "Medico" }}
+        options={{
+          tabBarLabel: "Medico",
+          tabBarLabelStyle: { fontFamily: "Poppins_500Medium" },
+        }}
       />
       <Tab.Screen
         name="Sports"
         component={Sports}
-        options={{ tabBarLabel: "Deportivo" }}
+        options={{
+          tabBarLabel: "Deportivo",
+          tabBarLabelStyle: { fontFamily: "Poppins_500Medium" },
+        }}
       />
     </Tab.Navigator>
   );
