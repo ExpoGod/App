@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { View, Text, Button } from "react-native";
+import { View, Text, Button, TouchableOpacity } from "react-native";
 import { useFonts } from "expo-font";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
@@ -26,11 +26,13 @@ function Home({ navigation }) {
   return (
     <SafeAreaView style={menuStyles.container}>
       <Header />
-      <View>
-        <Button
-          title="Traductor de LSM"
-          onPress={() => navigation.navigate("Translator")}
-        />
+      <View style={menuStyles.hero}>
+        <TouchableOpacity onPress={() => navigation.navigate("Translator")}>
+          <Text style={menuStyles.heroTittle}>Traductor de LSM</Text>
+          <Text style={menuStyles.heroText}>
+            Traduce señas a texto en tiempo real usando la cámara.
+          </Text>
+        </TouchableOpacity>
       </View>
       <View>
         <Button

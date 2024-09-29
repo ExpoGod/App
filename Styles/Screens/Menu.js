@@ -9,25 +9,19 @@ const menuStyles = StyleSheet.create({
     justifyContent: "flex-start",
     backgroundColor: "f5fffa",
   },
-  titleContainer: {
-    width: "100%",
-    height: "auto",
-    alignItems: "center",
-    marginTop: 20,
-    marginBottom: 25,
+
+  hero: {
+    position: "relative",
   },
-  title: {
+  heroTittle: {
     fontFamily: "Poppins_700Bold",
-    fontSize: 35,
+    fontSize: 50,
     color: "#1210af",
   },
-  paragraph: {
-    paddingLeft: 15,
-    paddingRight: 15,
+  heroText: {
     fontFamily: "Poppins_400Regular",
+    fontSize: 16,
     color: "#1210af",
-    justifyContent: "center",
-    textAlign: "center",
   },
 });
 
