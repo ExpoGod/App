@@ -6,6 +6,7 @@ const headerStyles = StyleSheet.create({
     height: "auto",
     alignItems: "center",
     marginTop: 70,
+    marginBottom: 50,
   },
   title: {
     fontFamily: "Poppins_700Bold",

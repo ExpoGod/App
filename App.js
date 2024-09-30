@@ -42,23 +42,64 @@ function Home({ navigation }) {
             resizeMode="contain"
           />
           <View>
-            <Text style={menuStyles.heroTittle1}>Traductor</Text>
-            <Text style={menuStyles.heroTittle2}>de LSM</Text>
+            <Text style={menuStyles.heroTitle1}>Traductor</Text>
+            <Text style={menuStyles.heroTitle2}>de LSM</Text>
           </View>
           <Text style={menuStyles.heroText}>
-            Traduce señas a texto en tiempo real usando la cámara.
+            Traduce señas a texto en tiempo real, usando la cámara.
           </Text>
         </TouchableOpacity>
       </View>
-      <View>
-        <Button
-          title="Intérprete Virtual"
-          onPress={() => navigation.navigate("Interpreter")}
-        />
-        <Button
-          title="Preguntas Frecuentes"
-          onPress={() => navigation.navigate("Questions")}
-        />
+      <View style={menuStyles.footer}>
+        <View style={menuStyles.footer1}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Interpreter")}
+            style={menuStyles.footerBtn1}
+          >
+            <Image
+              source={require("./Assets/Images/InterpreterShape.png")}
+              style={menuStyles.interShape}
+              resizeMode="contain"
+            />
+            <Image
+              source={require("./Assets/Images/InterpreterPerson.png")}
+              style={menuStyles.interPerson}
+              resizeMode="contain"
+            />
+            <Text style={menuStyles.interTitle1}>Intérprete</Text>
+            <Text style={menuStyles.interTitle2}>Virtual</Text>
+            <Text style={menuStyles.footerText1}>
+              Convierte texto o voz en señas con un intérprete virtual.
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <View style={menuStyles.footer2}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Questions")}
+            style={menuStyles.footerBtn2}
+          >
+            <Image
+              source={require("./Assets/Images/QuestionsShape.png")}
+              style={menuStyles.questionsShape}
+              resizeMode="contain"
+            />
+            <Image
+              source={require("./Assets/Images/Person1.png")}
+              style={menuStyles.person1}
+              resizeMode="contain"
+            />
+            <Image
+              source={require("./Assets/Images/Person2.png")}
+              style={menuStyles.person2}
+              resizeMode="contain"
+            />
+            <Text style={menuStyles.questionsTitle1}>Catálogo</Text>
+            <Text style={menuStyles.questionsTitle2}>Respuestas</Text>
+            <Text style={menuStyles.questionsText}>
+              Accede a una base de datos inteligente con respuestas rápidas.
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -94,36 +135,51 @@ function App() {
           name="Translator"
           component={Translator}
           options={{
-            title: "Intérprete Virtual",
+            title: "Traductor de LSM",
             headerTitleAlign: "center",
+            headerStyle: {
+              backgroundColor: "#1210af",
+            },
             headerTitleStyle: {
               fontFamily: "Poppins_600SemiBold",
-              color: "#1210af",
+              color: "#fff",
+              fontSize: 30,
             },
+            headerTintColor: "#fff",
           }}
         />
         <Stack.Screen
           name="Interpreter"
           component={Interpreter}
           options={{
-            title: "Traductor de LSM",
+            title: "Intérprete Virtual",
             headerTitleAlign: "center",
+            headerStyle: {
+              backgroundColor: "#1210af",
+            },
             headerTitleStyle: {
               fontFamily: "Poppins_600SemiBold",
-              color: "#1210af",
+              color: "#fff",
+              fontSize: 30,
             },
+            headerTintColor: "#fff",
           }}
         />
         <Stack.Screen
           name="Questions"
           component={Questions}
           options={{
-            title: "Preguntas Frecuentes",
+            title: "Catálogo de Respuestas",
             headerTitleAlign: "center",
+            headerStyle: {
+              backgroundColor: "#1210af",
+            },
             headerTitleStyle: {
               fontFamily: "Poppins_600SemiBold",
-              color: "#1210af",
+              color: "#fff",
+              fontSize: 30,
             },
+            headerTintColor: "#fff",
           }}
         />
       </Stack.Navigator>
