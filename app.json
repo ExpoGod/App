@@ -1,9 +1,24 @@
 {
   "expo": {
     "name": "App",
-    "slug": "App",
+    "slug": "citeim",
     "version": "1.0.0",
     "orientation": "portrait",
-    "plugins": ["expo-font"]
+    "plugins": [
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "a76ddbe0-dabf-49e6-9851-d6a8faa4b4d6"
+      }
+    },
+    "android": {
+      "package": "com.CITEIM.App",
+      "permissions" : [
+        "CAMERA",
+        "RECORD_AUDIO"
+      ]
+    },
+    "owner": "daemoncmd"
   }
 }

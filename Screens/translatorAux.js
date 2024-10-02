@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, PermissionsAndroid, TextInput, Modal, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-
+import { useNavigation } from "@react-navigation/native";
 import { RTCView, mediaDevices, RTCPeerConnection, RTCSessionDescription } from 'react-native-webrtc';
 import uuid from 'react-native-uuid';
 
@@ -47,6 +47,7 @@ const Translator = () => {
     const peerId = uuid.v4();
     let lastWord = null;
 
+    const navigation = useNavigation();
 
     async function requestPermissions() {
         try {
@@ -116,14 +117,7 @@ const Translator = () => {
     const negotiate = async () => {
         const SIGNALING_SERVER_URL = `http://${ipAddress}:8080/offer`;
         const offerDescription = await pc.current.createOffer(sessionConstraints);
-        try{
-            console.log("Crear Local Desc: "+ offerDescription)
-            await pc.current.setLocalDescription(offerDescription);
-            console.log("Creado")
-        } catch (e) {
-            console.log("ErrorSetLocalDescription: "+e)
-        }
-        
+        await pc.current.setLocalDescription(offerDescription);
 
         try {
             const response = await fetch(SIGNALING_SERVER_URL, {
@@ -394,7 +388,7 @@ const styles = StyleSheet.create({
         height: '30%',
     },
     cameraView: {
-        backgroundColor: '#000',
+        backgroundColor: 'purple',
         width: '100%',
         height: '70%',
         alignItems: 'center',
