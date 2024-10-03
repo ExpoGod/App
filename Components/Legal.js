@@ -1,13 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import {
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Button,
-  View,
-  Modal,
-} from "react-native";
+import { Text, TouchableOpacity, StyleSheet, View, Modal } from "react-native";
 import legalStyles from "../Styles/Components/Legal";
 import { Video } from "expo-av";
 
