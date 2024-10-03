@@ -25,7 +25,7 @@ const Sections = () => {
         component={Legal}
         options={{
           tabBarLabel: "Juridico",
-          tabBarLabelStyle: { fontFamily: "Poppins_500Medium" },
+          tabBarLabelStyle: { fontFamily: "Poppins_600SemiBold", fontSize: 20 },
         }}
       />
       <Tab.Screen
@@ -33,7 +33,7 @@ const Sections = () => {
         component={Medical}
         options={{
           tabBarLabel: "Medico",
-          tabBarLabelStyle: { fontFamily: "Poppins_500Medium" },
+          tabBarLabelStyle: { fontFamily: "Poppins_600SemiBold", fontSize: 20 },
         }}
       />
       <Tab.Screen
@@ -41,7 +41,7 @@ const Sections = () => {
         component={Sports}
         options={{
           tabBarLabel: "Deportivo",
-          tabBarLabelStyle: { fontFamily: "Poppins_500Medium" },
+          tabBarLabelStyle: { fontFamily: "Poppins_600SemiBold", fontSize: 20 },
         }}
       />
     </Tab.Navigator>
