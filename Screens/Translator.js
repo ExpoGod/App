@@ -1,10 +1,16 @@
-import { Text, View } from "react-native";
+import { Text, View, Image } from "react-native";
 import translatorStyles from "../Styles/Screens/Translator";
 
 function Translator() {
   return (
     <View style={translatorStyles.container}>
-      <Text>Traductor de LSM</Text>
+      <Image
+        source={require("../Assets/Gifs/loader.gif")}
+        resizeMode="contain"
+      />
+      <View style={translatorStyles.box}>
+        <Text style={translatorStyles.boxText}>Traduciendo...</Text>
+      </View>
     </View>
   );
 }
