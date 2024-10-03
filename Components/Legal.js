@@ -204,6 +204,33 @@ function Legal() {
           </View>
         </View>
       </Modal>
+      {/**/}
+      <TouchableOpacity style={legalStyles.question}>
+        <Text style={legalStyles.questionText}>
+          ¿Cómo puedo registrar un negocio pequeño?
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={legalStyles.question}>
+        <Text style={legalStyles.questionText}>
+          ¿Dónde puedo aprender más sobre mis derechos laborales?
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={legalStyles.question}>
+        <Text style={legalStyles.questionText}>
+          ¿Cómo puedo solicitar una orden de protección si me siento en peligro?
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={legalStyles.question}>
+        <Text style={legalStyles.questionText}>
+          ¿Qué debo hacer si quiero iniciar un proceso de divorcio?
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={legalStyles.question}>
+        <Text style={legalStyles.questionText}>
+          ¿Cómo puedo obtener asesoría legal para resolver un problema de
+          alquiler?
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
