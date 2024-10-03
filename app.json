@@ -4,6 +4,9 @@
     "slug": "App",
     "version": "1.0.0",
     "orientation": "portrait",
-    "plugins": ["expo-font"]
+    "plugins": [
+      "expo-font",
+      "expo-video"
+    ]
   }
 }
