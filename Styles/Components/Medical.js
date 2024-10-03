@@ -10,7 +10,7 @@ const medicalStyles = StyleSheet.create({
     width: "100%",
     height: "100%",
     gap: 15,
-    paddingTop: 15,
+    paddingTop: 25,
     backgroundColor: "#2196f3",
   },
 
