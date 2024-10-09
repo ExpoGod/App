@@ -7,6 +7,15 @@
     "plugins": [
       "expo-font",
       "expo-video"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "17ce2888-b1e9-4860-af64-d6c091c5842b"
+      }
+    },
+    "android": {
+      "package": "com.CITEIMAPP.app",
+      "permissions": ["CAMERA"]
+    }
   }
 }
