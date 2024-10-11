@@ -15,7 +15,12 @@
     },
     "android": {
       "package": "com.CITEIMAPP.app",
-      "permissions": ["CAMERA"]
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "INTERNET"
+      ],
+      "usesCleartextTraffic": true
     }
   }
 }
