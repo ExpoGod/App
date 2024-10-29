@@ -2,6 +2,7 @@ import { Text, View, TouchableOpacity, StyleSheet, Modal } from "react-native";
 import sportsStyles from "../Styles/Components/Sports";
 import { useState } from "react";
 import { Video } from "expo-av";
+import Card from './Card';
 
 const Sports = () => {
   const [modalVisible, setModalVisible] = useState(false);
