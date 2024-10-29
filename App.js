@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { View, Text, Button, Image, TouchableOpacity } from "react-native";
+import { View, Text, Button, Image, TouchableOpacity, PermissionsAndroid } from "react-native";
 import { useFonts } from "expo-font";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
@@ -113,7 +113,27 @@ function App() {
     Poppins_700Bold,
   });
 
+  async function requestPermissions() {
+    try {
+        const granted = await PermissionsAndroid.requestMultiple([
+            PermissionsAndroid.PERMISSIONS.CAMERA,
+            PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        ]);
+        if (
+            granted['android.permission.CAMERA'] === PermissionsAndroid.RESULTS.GRANTED &&
+            granted['android.permission.RECORD_AUDIO'] === PermissionsAndroid.RESULTS.GRANTED
+        ) {
+            console.log('You can use the camera and microphone');
+        } else {
+            console.log('Camera or Microphone permission denied');
+        }
+    } catch (err) {
+        console.warn(err);
+    }
+};
+
   useEffect(() => {
+    requestPermissions();
     if (loaded || error) {
       SplashScreen.hideAsync();
     }

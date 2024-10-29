@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from "@react-navigation/native";
 import { RTCView, mediaDevices, RTCPeerConnection, RTCSessionDescription } from 'react-native-webrtc';
 import uuid from 'react-native-uuid';
-import { Camera } from 'expo-camera';
+
 
 let peerConstraints = {
     iceServers: [
@@ -48,7 +48,6 @@ const Traductor = () => {
     const peerId = uuid.v4();
     let lastWord = null;
 
-    const navigation = useNavigation();
 
     async function requestPermissions() {
         try {
@@ -70,7 +69,7 @@ const Traductor = () => {
     };
 
     const createSocketConnection = () => {
-        const SOCKET_SERVER_URL = `ws://${ipAddress}:8080/ws`;
+        const SOCKET_SERVER_URL = `ws://${ipAddress}:8000/ws/feedback`;
         const websocket = new WebSocket(SOCKET_SERVER_URL);
 
         websocket.onopen = () => {
@@ -116,7 +115,7 @@ const Traductor = () => {
     };
 
     const negotiate = async () => {
-        const SIGNALING_SERVER_URL = `http://${ipAddress}:8080/offer`;
+        const SIGNALING_SERVER_URL = `http://${ipAddress}:8000/api/webrtc/offer`;
         const offerDescription = await pc.current.createOffer(sessionConstraints);
         await pc.current.setLocalDescription(offerDescription);
 
