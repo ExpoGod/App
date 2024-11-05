@@ -20,8 +20,8 @@ let peerConstraints = {
 let mediaConstraints = {
     audio: false,
     video: {
-        width: { ideal: 640 },
-        height: { ideal: 480 },
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
         frameRate: 15,
         facingMode: 'user' // 'environment' para la cámara trasera
     }
@@ -48,6 +48,9 @@ const Traductor = () => {
     const peerId = uuid.v4();
     let lastWord = null;
 
+    async function sendText() {
+        socket.current.send('Ready');
+    };
 
     async function requestPermissions() {
         try {
@@ -70,7 +73,8 @@ const Traductor = () => {
 
     const createSocketConnection = () => {
         //ws://${ipAddress}:8000/ws/feedback   Django
-        const SOCKET_SERVER_URL = `ws://${ipAddress}:8080/ws`;
+        //ws://${ipAddress}:8080/ws             flask
+        const SOCKET_SERVER_URL = `ws://${ipAddress}:8080/ws/feedback`;
         const websocket = new WebSocket(SOCKET_SERVER_URL);
 
         websocket.onopen = () => {
@@ -83,8 +87,10 @@ const Traductor = () => {
                 const firstWord = e.data;
 
                 if (firstWord !== "null" && firstWord !== lastWord) {
+                    setTexto('');
                     setTexto((prevTexto) => {
                         const palabras = prevTexto.split(' ');
+                        
 
                         const nuevasPalabras = [...palabras, firstWord];
 
@@ -117,7 +123,8 @@ const Traductor = () => {
 
     const negotiate = async () => {
         //http://${ipAddress}:8000/api/webrtc/offer   Django
-        const SIGNALING_SERVER_URL = `http://${ipAddress}:8080/offer`;
+        //http://${ipAddress}:8080/offer              flask
+        const SIGNALING_SERVER_URL = `http://${ipAddress}:8080/api/webrtc/offer`;
         const offerDescription = await pc.current.createOffer(sessionConstraints);
         await pc.current.setLocalDescription(offerDescription);
 
@@ -236,6 +243,7 @@ const Traductor = () => {
             console.log('Streaming iniciado')
 
         } else {
+            sendText();
             console.log('Iniciada detención de transmisión')
             const videoSender = pc.current.getSenders().find(sender => sender.track && sender.track.kind === 'video');
 
@@ -245,6 +253,7 @@ const Traductor = () => {
                 console.log('Transmisión de video detenida');
             }
             setIsStreaming(false);
+            
         }
     };
 
@@ -329,25 +338,34 @@ const Traductor = () => {
                 <View style={styles.cameraView}>
                     {localMediaStream && (
                         <RTCView
+                            mirror = {true}
                             streamURL={localMediaStream.toURL()}
                             style={styles.rtcView}
                             objectFit="cover"
                         />
                     )}
                 </View>
-                <TouchableOpacity
-                    onPress={start}
-                    style={{
-                        width: 100,
-                        height: 100,
-                        position: 'absolute',
-                        backgroundColor: isStreaming ? 'red' : '#fff',
-                        borderRadius: 50,
-                        top: 580,
-                        borderWidth: 13,
-                        borderColor: 'red'
-                    }}
-                />
+
+                {/* Contenedor para los botones */}
+                <View style={styles.buttonContainer}>
+                    {/* Botón de Streaming */}
+                    <TouchableOpacity
+                        onPress={start}
+                        style={[
+                            styles.streamingButton,
+                            { backgroundColor: isStreaming ? 'red' : '#fff' }
+                        ]}
+                    />
+
+                    {/* Botón de Envío de Texto */}
+                    {/*<TouchableOpacity
+                        onPress={sendText}
+                        style={styles.sendTextButton}
+                    >
+                        <Icon name="send" size={30} color="#fff" />
+                    </TouchableOpacity>*/}
+                </View>
+
                 <View style={styles.styleCuadroTexto}>
                     <Text style={{ textAlign: 'center', fontSize: 28, color: '#000' }}>Traductor de LSM a texto</Text>
                     <View style={styles.textOutput}>
@@ -394,7 +412,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '70%',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     rtcView: {
         width: '100%',
@@ -405,7 +423,7 @@ const styles = StyleSheet.create({
         width: '95%',
         height: '75%',
         marginLeft: 20,
-        borderRadius: 35
+        borderRadius: 35,
     },
     // Estilos para el Modal
     modalOverlay: {
@@ -448,6 +466,30 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
         textAlign: 'center',
+    },
+    // Estilos para los botones
+    buttonContainer: {
+        flexDirection: 'row',
+        position: 'absolute',
+        top: 580,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    streamingButton: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        borderWidth: 13,
+        borderColor: 'red',
+        marginRight: 20,
+    },
+    sendTextButton: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: '#024acf',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 });
 
