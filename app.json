@@ -1,9 +1,13 @@
 {
   "expo": {
-    "name": "App",
+    "name": "A La Mano",
     "slug": "App",
-    "version": "1.0.0",
-    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#9a79c7"
+    },
     "plugins": [
       "expo-font",
       "expo-video"
@@ -20,7 +24,12 @@
         "RECORD_AUDIO",
         "INTERNET"
       ],
-      "usesCleartextTraffic": true
-    }
+      "usesCleartextTraffic": true,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#9a79c7"
+      }
+    },
+    "owner": "daemoncmd"
   }
 }

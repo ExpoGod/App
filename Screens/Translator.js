@@ -69,7 +69,8 @@ const Traductor = () => {
     };
 
     const createSocketConnection = () => {
-        const SOCKET_SERVER_URL = `ws://${ipAddress}:8000/ws/feedback`;
+        //ws://${ipAddress}:8000/ws/feedback   Django
+        const SOCKET_SERVER_URL = `ws://${ipAddress}:8080/ws`;
         const websocket = new WebSocket(SOCKET_SERVER_URL);
 
         websocket.onopen = () => {
@@ -115,7 +116,8 @@ const Traductor = () => {
     };
 
     const negotiate = async () => {
-        const SIGNALING_SERVER_URL = `http://${ipAddress}:8000/api/webrtc/offer`;
+        //http://${ipAddress}:8000/api/webrtc/offer   Django
+        const SIGNALING_SERVER_URL = `http://${ipAddress}:8080/offer`;
         const offerDescription = await pc.current.createOffer(sessionConstraints);
         await pc.current.setLocalDescription(offerDescription);
 
