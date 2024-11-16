@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, PermissionsAndroid, TextInput, Modal, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from "@react-navigation/native";
 import { RTCView, mediaDevices, RTCPeerConnection, RTCSessionDescription } from 'react-native-webrtc';
 import uuid from 'react-native-uuid';
 
@@ -36,7 +35,6 @@ let sessionConstraints = {
 };
 
 const Traductor = () => {
-    const [iceState, setIceState] = useState('disconnected');
     const [texto, setTexto] = useState('');
     const [localMediaStream, setLocalMediaStream] = useState(null);
     const [isStreaming, setIsStreaming] = useState(false);
@@ -45,11 +43,34 @@ const Traductor = () => {
     const [modalVisible, setModalVisible] = useState(true); // Controla la visibilidad del Modal
     const socket = useRef(null);
     const pc = useRef(null);
+    //const dc = useRef(null);
+    const [dc, setDc] = useState(null);
+    const [dcOpen, setDcOpen] = useState(false);
     const peerId = uuid.v4();
     let lastWord = null;
 
-    async function sendText() {
-        socket.current.send('Ready');
+    function closePC() {
+        console.log('Componente desmontado');
+        /*if (isStreaming) {
+            start();
+        }*/
+        if (pc.current) {
+            pc.current.close();
+        }
+
+        if (socket.current) {
+            socket.current.close();
+        }
+    }
+
+    function sendText() {
+        //socket.current.send('Ready');
+        try {
+            dc.send('Ready ' + peerId);
+            console.log('Ready message sent');
+        } catch (e) {
+            console.log('Error enviando Ready:', e);
+        }
     };
 
     async function requestPermissions() {
@@ -79,7 +100,6 @@ const Traductor = () => {
 
         websocket.onopen = () => {
             console.log('Conectado al WebSocket');
-            websocket.send('¡Hola servidor WebSocket!');
         };
 
         websocket.onmessage = (e) => {
@@ -90,7 +110,7 @@ const Traductor = () => {
                     setTexto('');
                     setTexto((prevTexto) => {
                         const palabras = prevTexto.split(' ');
-                        
+
 
                         const nuevasPalabras = [...palabras, firstWord];
 
@@ -141,8 +161,14 @@ const Traductor = () => {
                 }),
             });
             const answer = await response.json();
-            console.log('Respuesta del servidor: ' + answer.data)
-            await pc.current.setRemoteDescription(new RTCSessionDescription(answer));
+            //console.log('Respuesta del servidor: ' + answer.data)
+
+            if (pc.current.signalingState != 'stable') {
+                await pc.current.setRemoteDescription(new RTCSessionDescription(answer));
+            } else {
+                console.log('Renegociacion Denegada')
+            }
+
             console.log('Negociación Exitosa')
         } catch (e) {
             console.log('Error al Negociar: ' + e)
@@ -217,6 +243,9 @@ const Traductor = () => {
                 console.log('Data channel is closed');
             });
         });
+
+
+
     };
 
     const initCamera = async () => {
@@ -233,27 +262,67 @@ const Traductor = () => {
         };
     };
 
+    const dataChannelCreation = async () => {
+        //Creacion del canal de datos
+        let datachannel = pc.current.createDataChannel(peerId);
+        datachannel.addEventListener('open', event => {
+            console.log('datachannel opened')
+            datachannel.send('ping')
+        });
+
+        datachannel.addEventListener('close', event => {
+            setDcOpen(false);
+            setDc(null);
+            datachannel.close();
+            console.log('Cerrado DataChannel');
+        });
+
+        datachannel.addEventListener('message', message => {
+            console.log('Received' + message.data)
+        });
+        setDc(datachannel);
+        setDcOpen(true);
+
+    };
+
     const start = async () => {
         if (!isStreaming) {
-            // Agrega la pista de video local al peer connection
-            localMediaStream.getTracks().forEach(track => {
-                pc.current.addTrack(track, localMediaStream);
-            });
-            setIsStreaming(true);
-            console.log('Streaming iniciado')
+            if (dcOpen) {
+                const newVideoTrack = localMediaStream.getVideoTracks()[0]
+                pc.current.addTrack(newVideoTrack, localMediaStream);
+                await negotiate();
+                console.log('Pista de video añadida nuevamente');
+            }
+            else {
+                // Agrega la pista de video local al peer connection
+                localMediaStream.getTracks().forEach(track => {
+                    pc.current.addTrack(track, localMediaStream);
+                });
+                setIsStreaming(true);
+                console.log('Streaming iniciado')
+
+                //dataChannelCreation();
+
+            }
 
         } else {
-            sendText();
+            //sendText();
             console.log('Iniciada detención de transmisión')
-            const videoSender = pc.current.getSenders().find(sender => sender.track && sender.track.kind === 'video');
+            /*const videoSender = pc.current.getSenders().find(sender => sender.track && sender.track.kind === 'video');
 
             if (videoSender) {
                 pc.current.removeTrack(videoSender); // Remover la pista de video de la conexión
-                await negotiate();
-                console.log('Transmisión de video detenida');
-            }
+                //await negotiate();
+                /*if(!dcOpen)
+                    dataChannelCreation();
+                console.log('Transmision de video detenida');
+                //sendText();
+            }*/
+            closePC();
+            createPeerConnection();
+            dataChannelCreation();
+            sendText();
             setIsStreaming(false);
-            
         }
     };
 
@@ -262,21 +331,11 @@ const Traductor = () => {
             requestPermissions();
             initCamera();
             createPeerConnection();
-            createSocketConnection();
+            //createSocketConnection();
         }
 
         return () => {
-            console.log('Componente desmontado');
-            if (isStreaming) {
-                start();
-            }
-            if (pc.current) {
-                pc.current.close();
-            }
-
-            if (socket.current) {
-                socket.current.close();
-            }
+            closePC();
         }
     }, [ipSet]); // Ejecutar useEffect cuando ipSet cambie
 
@@ -338,7 +397,7 @@ const Traductor = () => {
                 <View style={styles.cameraView}>
                     {localMediaStream && (
                         <RTCView
-                            mirror = {true}
+                            mirror={true}
                             streamURL={localMediaStream.toURL()}
                             style={styles.rtcView}
                             objectFit="cover"
