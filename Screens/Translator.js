@@ -63,11 +63,20 @@ const Traductor = () => {
         }
     }
 
-    function sendText() {
+    async function sendText(msgNum) {
         //socket.current.send('Ready');
+        let mensaje = '';
+        switch (msgNum){
+            case 1:
+                mensaje = 'CloseConnection'
+                break;
+            case 2:
+                mensaje = 'Ready ' + peerId
+                break;
+        }
         try {
-            dc.send('Ready ' + peerId);
-            console.log('Ready message sent');
+            dc.send(mensaje);
+            console.log('Message '+msgNum+' sent');
         } catch (e) {
             console.log('Error enviando Ready:', e);
         }
@@ -163,9 +172,11 @@ const Traductor = () => {
             const answer = await response.json();
             //console.log('Respuesta del servidor: ' + answer.data)
 
-            if (pc.current.signalingState != 'stable') {
+            if (pc.current.signalingState != 'stable' && pc.current.signalingState === 'have-local-offer') {
                 await pc.current.setRemoteDescription(new RTCSessionDescription(answer));
-            } else {
+            }
+            else
+            {
                 console.log('Renegociacion Denegada')
             }
 
@@ -175,7 +186,7 @@ const Traductor = () => {
         }
     };
 
-    const createPeerConnection = () => {
+    const createPeerConnection = async () => {
         try {
             pc.current = new RTCPeerConnection(peerConstraints);
             console.log('WebRTC ON')
@@ -278,8 +289,9 @@ const Traductor = () => {
         });
 
         datachannel.addEventListener('message', message => {
-            console.log('Received' + message.data)
+            console.log('Received ' + message.data)
         });
+        setDc(null);
         setDc(datachannel);
         setDcOpen(true);
 
@@ -288,9 +300,12 @@ const Traductor = () => {
     const start = async () => {
         if (!isStreaming) {
             if (dcOpen) {
-                const newVideoTrack = localMediaStream.getVideoTracks()[0]
-                pc.current.addTrack(newVideoTrack, localMediaStream);
-                await negotiate();
+                // Agrega la pista de video local al peer connection
+                localMediaStream.getTracks().forEach(track => {
+                    pc.current.addTrack(track, localMediaStream);
+                });
+                await negotiate()
+                setIsStreaming(true);
                 console.log('Pista de video añadida nuevamente');
             }
             else {
@@ -301,30 +316,41 @@ const Traductor = () => {
                 setIsStreaming(true);
                 console.log('Streaming iniciado')
 
-                //dataChannelCreation();
+                dataChannelCreation();
 
             }
 
         } else {
+            await sendText(1);
             //sendText();
             console.log('Iniciada detención de transmisión')
-            /*const videoSender = pc.current.getSenders().find(sender => sender.track && sender.track.kind === 'video');
+            const videoSender = pc.current.getSenders().find(sender => sender.track && sender.track.kind === 'video');
 
             if (videoSender) {
                 pc.current.removeTrack(videoSender); // Remover la pista de video de la conexión
                 //await negotiate();
                 /*if(!dcOpen)
                     dataChannelCreation();
-                console.log('Transmision de video detenida');
+                console.log('Transmision de video detenida');*/
                 //sendText();
-            }*/
-            closePC();
-            createPeerConnection();
-            dataChannelCreation();
-            sendText();
+            }
+            //closePC();
+            console.log('---------------1')
+            await createPeerConnection();
+            await wait(1000);
+            console.log('---------------2')
+            await dataChannelCreation();
+            await wait(3000);
+            console.log('---------------3')
+            await sendText(2);
+            console.log('---------------4')
             setIsStreaming(false);
         }
     };
+
+    function wait(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     useEffect(() => {
         if (ipSet) {
