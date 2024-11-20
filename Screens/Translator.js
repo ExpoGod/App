@@ -278,7 +278,7 @@ const Traductor = () => {
         let datachannel = pc.current.createDataChannel(peerId);
         datachannel.addEventListener('open', event => {
             console.log('datachannel opened')
-            datachannel.send('ping')
+            //datachannel.send('ping')
         });
 
         datachannel.addEventListener('close', event => {
@@ -289,7 +289,9 @@ const Traductor = () => {
         });
 
         datachannel.addEventListener('message', message => {
-            console.log('Received ' + message.data)
+            console.log('Recibido: '+message)
+            setTexto('')
+            setTexto(message)
         });
         setDc(null);
         setDc(datachannel);
