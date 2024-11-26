@@ -66,7 +66,7 @@ const Traductor = () => {
     async function sendText(msgNum) {
         //socket.current.send('Ready');
         let mensaje = '';
-        switch (msgNum){
+        switch (msgNum) {
             case 1:
                 mensaje = 'CloseConnection'
                 break;
@@ -76,7 +76,7 @@ const Traductor = () => {
         }
         try {
             dc.send(mensaje);
-            console.log('Message '+msgNum+' sent');
+            console.log('Message ' + msgNum + ' sent');
         } catch (e) {
             console.log('Error enviando Ready:', e);
         }
@@ -175,8 +175,7 @@ const Traductor = () => {
             if (pc.current.signalingState != 'stable' && pc.current.signalingState === 'have-local-offer') {
                 await pc.current.setRemoteDescription(new RTCSessionDescription(answer));
             }
-            else
-            {
+            else {
                 console.log('Renegociacion Denegada')
             }
 
@@ -289,9 +288,16 @@ const Traductor = () => {
         });
 
         datachannel.addEventListener('message', message => {
-            console.log('Recibido: '+message)
-            setTexto('')
-            setTexto(message)
+            try {
+                mensaje = JSON.parse(message.data)
+                console.log('Recibido: ' + mensaje.result)
+                setTexto('')
+                setTexto(mensaje.result)
+            } catch (error) {
+                console.log('Error al procesar datos recibidos: ' + error)
+                setTexto('')
+                setTexto(message)
+            }
         });
         setDc(null);
         setDc(datachannel);
