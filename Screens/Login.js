@@ -5,9 +5,29 @@ function Login({ navigation }) {
   const [claveDependencia, setClaveDependencia] = useState("");
   const [idTablet, setIdTablet] = useState("");
   const [claveSecreta, setClaveSecreta] = useState("");
+  const [token, setToken] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Aquí va la lógica de autenticación
+    try {
+        const response = await fetch('http://localhost:8080/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                clave_dependencia : claveDependencia,
+                ID_tablet : idTablet,
+                clave_secreta : claveSecreta
+            }),
+        });
+        const answer = await response.json();
+        setToken(answer.token);
+        
+    } catch (e) {
+        console.log('Error de Autenticacion: ' + e)
+    }
+
     if (claveDependencia === "Dep" && idTablet === "Tab" && claveSecreta === "Sec") {
       navigation.replace("Home"); // Navega a Home si la autenticación es exitosa
     } else {
