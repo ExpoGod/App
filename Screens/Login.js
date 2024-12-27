@@ -10,29 +10,32 @@ function Login({ navigation }) {
   const handleLogin = async () => {
     // Aquí va la lógica de autenticación
     try {
-        const response = await fetch('http://localhost:8080/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                clave_dependencia : claveDependencia,
-                ID_tablet : idTablet,
-                clave_secreta : claveSecreta
-            }),
-        });
-        const answer = await response.json();
+      const response = await fetch('http://10.0.2.2:8080/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          clave_dependencia: claveDependencia,
+          ID_tablet: idTablet,
+          clave_secreta: claveSecreta
+        }),
+      });
+      const answer = await response.json();
+      
+
+      if (response.status === 200) {
         setToken(answer.token);
-        
+        navigation.replace("Home"); 
+      } else {
+        alert("Datos de autenticación incorrectos. Verifica los campos e inténtalo nuevamente:" + answer.message);
+      }
+
     } catch (e) {
-        console.log('Error de Autenticacion: ' + e)
+      console.log('Error de Autenticacion: ' + e)
     }
 
-    if (claveDependencia === "Dep" && idTablet === "Tab" && claveSecreta === "Sec") {
-      navigation.replace("Home"); // Navega a Home si la autenticación es exitosa
-    } else {
-      alert("Datos de autenticación incorrectos. Verifica los campos e inténtalo nuevamente.");
-    }
+
   };
 
   return (

@@ -371,7 +371,7 @@ const Traductor = () => {
         return () => {
             closePC();
         }
-    }, [ipSet]); // Ejecutar useEffect cuando ipSet cambie
+    }, [ipSet]); 
 
     const handleConnect = () => {
         if (ipAddress.trim() !== '') {
