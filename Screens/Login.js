@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { SafeAreaView, View, Text, TextInput, Button, StyleSheet } from "react-native";
+import * as SecureStore from 'expo-secure-store';
+
 
 function Login({ navigation }) {
   const [claveDependencia, setClaveDependencia] = useState("");
@@ -10,7 +12,7 @@ function Login({ navigation }) {
   const handleLogin = async () => {
     // Aquí va la lógica de autenticación
     try {
-      const response = await fetch('http://10.0.2.2:8080/', {
+      const response = await fetch('http://192.168.100.25:8080/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -22,11 +24,12 @@ function Login({ navigation }) {
         }),
       });
       const answer = await response.json();
-      
+
 
       if (response.status === 200) {
-        setToken(answer.token);
-        navigation.replace("Home"); 
+        deleteToken();
+        saveToken(answer.token);
+        navigation.replace("Home");
       } else {
         alert("Datos de autenticación incorrectos. Verifica los campos e inténtalo nuevamente:" + answer.message);
       }
@@ -34,9 +37,25 @@ function Login({ navigation }) {
     } catch (e) {
       console.log('Error de Autenticacion: ' + e)
     }
-
-
   };
+
+  async function saveToken(token) {
+    try {
+      await SecureStore.setItemAsync('sessionToken', 'Token '+token);
+      console.log('Token guardado de forma segura.');
+    } catch (error) {
+      console.error('Error al guardar el token:', error);
+    }
+  }
+
+  async function deleteToken() {
+    try {
+      await SecureStore.deleteItemAsync('sessionToken');
+      console.log('Token eliminado de forma segura.');
+    } catch (error) {
+      console.error('Error al eliminar el token:', error);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.container}>

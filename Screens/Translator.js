@@ -3,6 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View, PermissionsAndroid, TextInput
 import Icon from 'react-native-vector-icons/Ionicons';
 import { RTCView, mediaDevices, RTCPeerConnection, RTCSessionDescription } from 'react-native-webrtc';
 import uuid from 'react-native-uuid';
+import * as SecureStore from 'expo-secure-store';
 
 
 let peerConstraints = {
@@ -41,6 +42,7 @@ const Traductor = () => {
     const [ipAddress, setIpAddress] = useState(''); // Estado para la dirección IP
     const [ipSet, setIpSet] = useState(false); // Estado para verificar si la IP ha sido establecida
     const [modalVisible, setModalVisible] = useState(true); // Controla la visibilidad del Modal
+    const [token, setToken] = useState(null);
     const socket = useRef(null);
     const pc = useRef(null);
     //const dc = useRef(null);
@@ -49,6 +51,40 @@ const Traductor = () => {
     const peerId = uuid.v4();
     let lastWord = null;
 
+    async function saveToken(token) {
+        try {
+            await SecureStore.setItemAsync('sessionToken', token);
+            console.log('Token guardado de forma segura.');
+        } catch (error) {
+            console.error('Error al guardar el token:', error);
+        }
+    }
+
+    async function deleteToken() {
+        try {
+            await SecureStore.deleteItemAsync('sessionToken');
+            console.log('Token eliminado de forma segura.');
+        } catch (error) {
+            console.error('Error al eliminar el token:', error);
+        }
+    }
+
+    async function getToken() {
+        try {
+          const token = await SecureStore.getItemAsync('sessionToken');
+          if (token) {
+            console.log('Token recuperado:', token);
+            return token;
+          } else {
+            console.log('No existe un token guardado.');
+            return null;
+          }
+        } catch (error) {
+          console.error('Error al recuperar el token:', error);
+          return null;
+        }
+      }
+      
     function closePC() {
         console.log('Componente desmontado');
         /*if (isStreaming) {
@@ -162,6 +198,7 @@ const Traductor = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': token
                 },
                 body: JSON.stringify({
                     sdp: offerDescription.sdp,
@@ -363,15 +400,18 @@ const Traductor = () => {
     useEffect(() => {
         if (ipSet) {
             requestPermissions();
+            setToken(getToken());
+            
             initCamera();
             createPeerConnection();
             //createSocketConnection();
+            
         }
 
         return () => {
             closePC();
         }
-    }, [ipSet]); 
+    }, [ipSet]);
 
     const handleConnect = () => {
         if (ipAddress.trim() !== '') {

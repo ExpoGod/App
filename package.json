@@ -29,7 +29,8 @@
     "react-native-tab-view": "^3.5.2",
     "react-native-uuid": "^2.0.2",
     "react-native-video": "^6.6.3",
-    "react-native-webrtc": "^124.0.4"
+    "react-native-webrtc": "^124.0.4",
+    "expo-secure-store": "~13.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
