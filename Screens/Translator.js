@@ -40,16 +40,15 @@ const Traductor = () => {
     const [localMediaStream, setLocalMediaStream] = useState(null);
     const [isStreaming, setIsStreaming] = useState(false);
     const [ipAddress, setIpAddress] = useState(''); // Estado para la dirección IP
-    const [ipSet, setIpSet] = useState(false); // Estado para verificar si la IP ha sido establecida
-    const [modalVisible, setModalVisible] = useState(true); // Controla la visibilidad del Modal
-    const [token, setToken] = useState(null);
+    const [ipSet, setIpSet] = useState(true); // Estado para verificar si la IP ha sido establecida
+    const [modalVisible, setModalVisible] = useState(false); // Controla la visibilidad del Modal
+    const [sessiontoken, setSessionToken] = useState(null);
     const socket = useRef(null);
     const pc = useRef(null);
     //const dc = useRef(null);
     const [dc, setDc] = useState(null);
     const [dcOpen, setDcOpen] = useState(false);
     const peerId = uuid.v4();
-    let lastWord = null;
 
     async function saveToken(token) {
         try {
@@ -71,20 +70,20 @@ const Traductor = () => {
 
     async function getToken() {
         try {
-          const token = await SecureStore.getItemAsync('sessionToken');
-          if (token) {
-            console.log('Token recuperado:', token);
-            return token;
-          } else {
-            console.log('No existe un token guardado.');
-            return null;
-          }
+            const tokenTemp = await SecureStore.getItemAsync('sessionToken');
+            if (tokenTemp) {
+                console.log('Token recuperado:', tokenTemp);
+                return tokenTemp;
+            } else {
+                console.log('No existe un token guardado.');
+                return null;
+            }
         } catch (error) {
-          console.error('Error al recuperar el token:', error);
-          return null;
+            console.error('Error al recuperar el token:', error);
+            return null;
         }
-      }
-      
+    }
+
     function closePC() {
         console.log('Componente desmontado');
         /*if (isStreaming) {
@@ -137,68 +136,20 @@ const Traductor = () => {
         }
     };
 
-    const createSocketConnection = () => {
-        //ws://${ipAddress}:8000/ws/feedback   Django
-        //ws://${ipAddress}:8080/ws             flask
-        const SOCKET_SERVER_URL = `ws://${ipAddress}:8080/ws/feedback`;
-        const websocket = new WebSocket(SOCKET_SERVER_URL);
-
-        websocket.onopen = () => {
-            console.log('Conectado al WebSocket');
-        };
-
-        websocket.onmessage = (e) => {
-            try {
-                const firstWord = e.data;
-
-                if (firstWord !== "null" && firstWord !== lastWord) {
-                    setTexto('');
-                    setTexto((prevTexto) => {
-                        const palabras = prevTexto.split(' ');
-
-
-                        const nuevasPalabras = [...palabras, firstWord];
-
-                        if (nuevasPalabras.length > 10) {
-                            nuevasPalabras.shift();
-                        }
-
-                        return nuevasPalabras.join(' ');
-                    });
-                    lastWord = firstWord;
-                }
-            } catch (error) {
-                console.log('Mensaje Recibido: ', e.message)
-            }
-            if (e.data === 'ping') {
-                websocket.send('pong');
-            }
-        };
-
-        websocket.onerror = (e) => {
-            console.error('Error en WebSocket:', e.message);
-        };
-
-        websocket.onclose = (e) => {
-            console.log('WebSocket desconectado:', e.reason);
-        };
-
-        socket.current = websocket;
-    };
-
     const negotiate = async () => {
         //http://${ipAddress}:8000/api/webrtc/offer   Django
         //http://${ipAddress}:8080/offer              flask
-        const SIGNALING_SERVER_URL = `http://${ipAddress}:8080/api/webrtc/offer`;
+        //const SIGNALING_SERVER_URL = `http://${ipAddress}:8080/api/webrtc/offer`;
+        const SIGNALING_SERVER_URL = `http://192.168.3.9:8080/api/webrtc/offer`;
         const offerDescription = await pc.current.createOffer(sessionConstraints);
         await pc.current.setLocalDescription(offerDescription);
-
+        console.log('token enviado: ' + sessiontoken)
         try {
             const response = await fetch(SIGNALING_SERVER_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': token
+                    'Authorization': sessiontoken
                 },
                 body: JSON.stringify({
                     sdp: offerDescription.sdp,
@@ -207,18 +158,24 @@ const Traductor = () => {
                 }),
             });
             const answer = await response.json();
-            //console.log('Respuesta del servidor: ' + answer.data)
+            if (response.status === 200) {
+                console.log('Respuesta del servidor: ' + answer.detail)
+                if (pc.current.signalingState != 'stable' && pc.current.signalingState === 'have-local-offer') {
+                    await pc.current.setRemoteDescription(new RTCSessionDescription(answer));
+                }
+                else {
+                    console.log('Renegociacion Denegada')
+                }
 
-            if (pc.current.signalingState != 'stable' && pc.current.signalingState === 'have-local-offer') {
-                await pc.current.setRemoteDescription(new RTCSessionDescription(answer));
-            }
-            else {
-                console.log('Renegociacion Denegada')
+                console.log('Negociación Exitosa')
+            } else {
+                console.log('Error al Negociar: ' + answer.detail);
+                start();
             }
 
-            console.log('Negociación Exitosa')
         } catch (e) {
             console.log('Error al Negociar: ' + e)
+            console.log('Respuesta del servidor: ' + answer.detail)
         }
     };
 
@@ -400,18 +357,25 @@ const Traductor = () => {
     useEffect(() => {
         if (ipSet) {
             requestPermissions();
-            setToken(getToken());
-            
+            (async () => {
+                const savedToken = await getToken();
+                setSessionToken(savedToken);
+            })();
+
             initCamera();
             createPeerConnection();
             //createSocketConnection();
-            
+
         }
 
         return () => {
             closePC();
         }
     }, [ipSet]);
+
+    useEffect(() => {
+        console.log('Token (estado): ', sessiontoken);
+    }, [sessiontoken]);
 
     const handleConnect = () => {
         if (ipAddress.trim() !== '') {

@@ -12,7 +12,7 @@ function Login({ navigation }) {
   const handleLogin = async () => {
     // Aquí va la lógica de autenticación
     try {
-      const response = await fetch('http://192.168.100.25:8080/', {
+      const response = await fetch('http://192.168.3.9:8080/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ function Login({ navigation }) {
         secureTextEntry
       />
 
-      <Button title="Iniciar Sesión" onPress={handleLogin} />
+      <Button title="Entrar" onPress={handleLogin} />
     </SafeAreaView>
   );
 }
