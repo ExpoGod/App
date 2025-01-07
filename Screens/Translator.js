@@ -136,20 +136,20 @@ const Traductor = () => {
         }
     };
 
-    const negotiate = async () => {
+    const negotiate = async (token) => {
         //http://${ipAddress}:8000/api/webrtc/offer   Django
         //http://${ipAddress}:8080/offer              flask
         //const SIGNALING_SERVER_URL = `http://${ipAddress}:8080/api/webrtc/offer`;
         const SIGNALING_SERVER_URL = `http://192.168.3.9:8080/api/webrtc/offer`;
         const offerDescription = await pc.current.createOffer(sessionConstraints);
         await pc.current.setLocalDescription(offerDescription);
-        console.log('token enviado: ' + sessiontoken)
+        console.log('token enviado: ' + token)
         try {
             const response = await fetch(SIGNALING_SERVER_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': sessiontoken
+                    'Authorization': token
                 },
                 body: JSON.stringify({
                     sdp: offerDescription.sdp,
@@ -174,8 +174,7 @@ const Traductor = () => {
             }
 
         } catch (e) {
-            console.log('Error al Negociar: ' + e)
-            console.log('Respuesta del servidor: ' + answer.detail)
+            console.log('Error al Negociar: ' + e);
         }
     };
 
@@ -215,7 +214,7 @@ const Traductor = () => {
         pc.current.addEventListener('negotiationneeded', async event => {
             console.log('Negotiation needed');
             // Iniciar Negociación
-            await negotiate();
+            await negotiate(sessiontoken);
         });
 
         pc.current.addEventListener('signalingstatechange', event => {
@@ -363,7 +362,6 @@ const Traductor = () => {
             })();
 
             initCamera();
-            createPeerConnection();
             //createSocketConnection();
 
         }
@@ -375,6 +373,7 @@ const Traductor = () => {
 
     useEffect(() => {
         console.log('Token (estado): ', sessiontoken);
+        createPeerConnection();
     }, [sessiontoken]);
 
     const handleConnect = () => {
