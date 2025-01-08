@@ -50,23 +50,6 @@ const Traductor = () => {
     const [dcOpen, setDcOpen] = useState(false);
     const peerId = uuid.v4();
 
-    async function saveToken(token) {
-        try {
-            await SecureStore.setItemAsync('sessionToken', token);
-            console.log('Token guardado de forma segura.');
-        } catch (error) {
-            console.error('Error al guardar el token:', error);
-        }
-    }
-
-    async function deleteToken() {
-        try {
-            await SecureStore.deleteItemAsync('sessionToken');
-            console.log('Token eliminado de forma segura.');
-        } catch (error) {
-            console.error('Error al eliminar el token:', error);
-        }
-    }
 
     async function getToken() {
         try {
@@ -360,10 +343,8 @@ const Traductor = () => {
                 const savedToken = await getToken();
                 setSessionToken(savedToken);
             })();
-
             initCamera();
             //createSocketConnection();
-
         }
 
         return () => {
