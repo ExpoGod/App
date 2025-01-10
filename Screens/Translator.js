@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, PermissionsAndroid, TextInput, Modal, Alert } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, PermissionsAndroid, ActivityIndicator, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { RTCView, mediaDevices, RTCPeerConnection, RTCSessionDescription } from 'react-native-webrtc';
 import uuid from 'react-native-uuid';
@@ -39,16 +39,15 @@ const Traductor = () => {
     const [texto, setTexto] = useState('');
     const [localMediaStream, setLocalMediaStream] = useState(null);
     const [isStreaming, setIsStreaming] = useState(false);
-    const [ipAddress, setIpAddress] = useState(''); // Estado para la dirección IP
-    const [ipSet, setIpSet] = useState(true); // Estado para verificar si la IP ha sido establecida
-    const [modalVisible, setModalVisible] = useState(false); // Controla la visibilidad del Modal
+    const [loading, setLoading] = useState(false);
     const [sessiontoken, setSessionToken] = useState(null);
     const socket = useRef(null);
     const pc = useRef(null);
-    //const dc = useRef(null);
     const [dc, setDc] = useState(null);
     const [dcOpen, setDcOpen] = useState(false);
     const peerId = uuid.v4();
+    const ip = '192.168.3.9';
+    const SIGNALING_SERVER_URL = 'http://' + ip + ':8080/api/webrtc/offer';
 
 
     async function getToken() {
@@ -123,7 +122,6 @@ const Traductor = () => {
         //http://${ipAddress}:8000/api/webrtc/offer   Django
         //http://${ipAddress}:8080/offer              flask
         //const SIGNALING_SERVER_URL = `http://${ipAddress}:8080/api/webrtc/offer`;
-        const SIGNALING_SERVER_URL = `http://192.168.3.9:8080/api/webrtc/offer`;
         const offerDescription = await pc.current.createOffer(sessionConstraints);
         await pc.current.setLocalDescription(offerDescription);
         console.log('token enviado: ' + token)
@@ -305,6 +303,7 @@ const Traductor = () => {
             }
 
         } else {
+            setLoading(true);
             await sendText(1);
             //sendText();
             console.log('Iniciada detención de transmisión')
@@ -312,23 +311,18 @@ const Traductor = () => {
 
             if (videoSender) {
                 pc.current.removeTrack(videoSender); // Remover la pista de video de la conexión
-                //await negotiate();
-                /*if(!dcOpen)
-                    dataChannelCreation();
-                console.log('Transmision de video detenida');*/
-                //sendText();
             }
-            //closePC();
             console.log('---------------1')
             await createPeerConnection();
             await wait(1000);
             console.log('---------------2')
             await dataChannelCreation();
-            await wait(3000);
+            await wait(1000);
             console.log('---------------3')
             await sendText(2);
             console.log('---------------4')
             setIsStreaming(false);
+            setLoading(false);
         }
     };
 
@@ -337,62 +331,35 @@ const Traductor = () => {
     }
 
     useEffect(() => {
-        if (ipSet) {
-            requestPermissions();
-            (async () => {
-                const savedToken = await getToken();
-                setSessionToken(savedToken);
-            })();
-            initCamera();
-            //createSocketConnection();
-        }
-
+        requestPermissions();
+        (async () => {
+            const savedToken = await getToken();
+            setSessionToken(savedToken);
+        })();
+        initCamera();
         return () => {
             closePC();
         }
-    }, [ipSet]);
+    }, []);
 
     useEffect(() => {
         console.log('Token (estado): ', sessiontoken);
         createPeerConnection();
     }, [sessiontoken]);
 
-    const handleConnect = () => {
-        if (ipAddress.trim() !== '') {
-            setIpSet(true);
-            setModalVisible(false); // Ocultar el modal
-        } else {
-            Alert.alert('Error', 'Por favor, ingrese una dirección IP válida.');
-        }
-    };
 
     return (
         <View style={styles.container}>
             {/* Modal para ingresar la dirección IP */}
             <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => {
-                    Alert.alert('Modal has been closed.');
-                }}
+                visible={loading}
+                transparent={true}       // Para que se vea un fondo semi-transparente
+                animationType="none"    // Quita la animación del modal si lo deseas
             >
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalView}>
-                        <Text style={styles.ipPrompt}>Ingrese la dirección IP del servidor:</Text>
-                        <TextInput
-                            style={styles.ipInput}
-                            placeholder="Ejemplo: 192.168.1.1"
-                            value={ipAddress}
-                            onChangeText={setIpAddress}
-                            keyboardType="numeric"
-                        />
-                        <TouchableOpacity
-                            style={styles.connectButton}
-                            onPress={handleConnect}
-                        >
-                            <Text style={styles.connectButtonText}>Conectar</Text>
-                        </TouchableOpacity>
+                <View style={styles.modalBackground}>
+                    <View style={styles.activityIndicatorWrapper}>
+                        <ActivityIndicator size="large" color="#333" />
+                        <Text style={{ marginTop: 10 }}>Cargando...</Text>
                     </View>
                 </View>
             </Modal>
@@ -502,47 +469,18 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         borderRadius: 35,
     },
-    // Estilos para el Modal
-    modalOverlay: {
+    // Estilos para el modal
+    modalBackground: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.5)', // Fondo semitransparente
+        backgroundColor: '#00000040', // Fondo semi-transparente
     },
-    modalView: {
-        width: '80%',
-        backgroundColor: '#8bb4d0',
-        borderRadius: 20,
-        padding: 35,
-        alignItems: 'center',
-        elevation: 5,
-    },
-    ipPrompt: {
-        fontSize: 20,
-        marginBottom: 15,
-        color: '#fff',
-        textAlign: 'center',
-    },
-    ipInput: {
-        height: 40,
-        borderColor: '#fff',
-        borderWidth: 1,
-        paddingHorizontal: 10,
-        marginBottom: 20,
-        width: '100%',
-        color: '#fff',
-    },
-    connectButton: {
-        backgroundColor: '#024acf',
+    activityIndicatorWrapper: {
+        backgroundColor: '#FFFFFF',
+        padding: 20,
         borderRadius: 10,
-        padding: 10,
-        elevation: 2,
-        width: '100%',
-    },
-    connectButtonText: {
-        color: '#fff',
-        fontWeight: 'bold',
-        textAlign: 'center',
+        alignItems: 'center',
     },
     // Estilos para los botones
     buttonContainer: {
