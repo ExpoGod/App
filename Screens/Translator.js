@@ -46,8 +46,7 @@ const Traductor = () => {
     const [dc, setDc] = useState(null);
     const [dcOpen, setDcOpen] = useState(false);
     const peerId = uuid.v4();
-    const ip = '192.168.3.9';
-    const SIGNALING_SERVER_URL = 'http://' + ip + ':8080/api/webrtc/offer';
+    const SIGNALING_SERVER_URL = 'http://192.168.100.25:8080/api/webrtc/offer';
 
 
     async function getToken() {

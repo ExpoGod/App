@@ -17,7 +17,7 @@ function Login({ navigation }) {
   const [idTablet, setIdTablet] = useState("");
   const [claveSecreta, setClaveSecreta] = useState("");
   const [loading, setLoading] = useState(true);
-  const ip = 'http://192.168.3.9:8080/';
+  const ip = 'http://192.168.100.25:8080/';
 
   const handleLogin = async () => {
     // Aquí va la lógica de autenticación
@@ -109,6 +109,7 @@ function Login({ navigation }) {
 
   useEffect(() => {
     checkToken();
+    //navigation.replace("Home");
     return () => {
 
     }
